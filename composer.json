@@ -1,0 +1,27 @@
+{
+    "name": "weblebby/sahibinden-api",
+    "description": "Sahibinden.com Advertise boots for stores.",
+    "version": "1.0.0",
+    "licence": "MIT",
+
+    "authors": [
+        {
+            "name": "Davut Kember",
+            "email": "davutkmbr@gmail.com"
+        }
+    ],
+
+    "require": {
+        "php": ">=5.3",
+        "php-curl-class/php-curl-class": "^7.1"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "Weblebby\\": "src/"
+        }
+    },
+
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
