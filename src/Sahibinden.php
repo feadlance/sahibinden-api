@@ -129,13 +129,12 @@ class Sahibinden
 		$price = isset($price[1]) ? strip_tags(str_replace(['.', ','], [null, '.'], $price[1])) : null;
 
 		$price_format = preg_replace('/[^0-9.,]/', null, $price);
-		$price_symbol = str_replace([$price_format, 'Emlak Endeksi'], null, $price);
+		$price_symbol = str_replace([$price_format, 'Emlak Endeksi', 'Kredi Teklifleri'], null, $price);
 
 		/*
 		 * Address
 		 */
 		preg_match('#<h2>(.*?)</h2><ul class="classifiedInfoList">#', $connection, $address_parent);
-		#dd($address_parent);
 		preg_match_all('#<a href="(.*?)"> (.*?)</a>#', isset($address_parent[1]) ? $address_parent[1] : null, $address);
 
 		$address = $this->array_map($address, [
@@ -181,6 +180,40 @@ class Sahibinden
 		preg_match('#<div id="gmap" data-lat="(.*?)" data-lon="(.*?)" data-lang="tr"></div>#', $connection, $location);
 
 		/*
+		 * Breadcrumb
+		 */
+		preg_match('#<div class="classifiedBreadCrumb"> <ul> (.*?) </ul>#', $connection, $breadcrumbs);
+		preg_match_all('#<li> <a class="(.*?)" href="(.*?)"> (.*?)</a> </li>#', $breadcrumbs[1], $breadcrumb);
+
+		$breadcrumbs = $this->array_map($breadcrumb, [
+			'name' => 3,
+			'url' => 2
+		]);
+
+		/*
+		 * Sale
+		 */
+		$sale = false;
+
+		foreach ($breadcrumbs as $key => $value) {
+			if ( $value['name'] === 'Satılık' ) {
+				$sale = true;
+			}
+		}
+
+		/*
+		 * Type
+		 */
+		$type = null;
+		$types = ['Arsa', 'Daire', 'Villa'];
+
+		foreach ($breadcrumbs as $key => $value) {
+			if ( in_array($value['name'], $types) ) {
+				$type = $value['name'];
+			}
+		}
+
+		/*
 		 * Extra
 		 */
 		preg_match('#<div class="uiBoxContainer classifiedDescription" id="classifiedProperties">(.*?)</div> </div><script type="text/javascript"> var bannerZoneId#', $connection, $extra_parent);
@@ -216,6 +249,9 @@ class Sahibinden
 			'video' => isset($video[1]) ? $video[1] : null,
 			'options' => $options,
 			'address' => $address,
+			'breadcrumbs' => $breadcrumbs,
+			'sale' => $sale,
+			'type' => $type,
 			'location' => [
 				'latitude' => isset($location[1]) ? $location[1] : null,
 				'longitude' => isset($location[2]) ? $location[2] : null
