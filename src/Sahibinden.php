@@ -134,7 +134,8 @@ class Sahibinden
 		/*
 		 * Address
 		 */
-		preg_match('#Emlak Endeksi</a> </h3><h2>(.*?)</h2>#', $connection, $address_parent);
+		preg_match('#<h2>(.*?)</h2><ul class="classifiedInfoList">#', $connection, $address_parent);
+		#dd($address_parent);
 		preg_match_all('#<a href="(.*?)"> (.*?)</a>#', isset($address_parent[1]) ? $address_parent[1] : null, $address);
 
 		$address = $this->array_map($address, [
